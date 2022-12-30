@@ -6,6 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.GestureDetector
@@ -102,7 +104,7 @@ class JogoDaVelhaView
     }
 
     fun reiniciarJogo() {
-        tabuleiro = Array(3){IntArray(3)}
+        tabuleiro = Array(3) { IntArray(3) }
         invalidate()
     }
 
@@ -171,6 +173,46 @@ class JogoDaVelhaView
 
         private fun ganhou(a: Int, b: Int, c: Int) = (a == b && b == c && a != VAZIO)
 
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        return EstadoJogo(super.onSaveInstanceState(), vez, tabuleiro)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val estado = state as EstadoJogo
+        super.onRestoreInstanceState(estado.superState)
+        vez = estado.vez
+        tabuleiro = estado.tabuleiro
+        invalidate()
+    }
+
+   class EstadoJogo : BaseSavedState {
+        var vez: Int
+        var tabuleiro: Array<IntArray>
+
+        constructor(superState: Parcelable?, vez: Int, tabuleiro: Array<IntArray>) :
+                super(superState) {
+            this.vez = vez
+            this.tabuleiro = tabuleiro
+        }
+
+        constructor(p: Parcel?) : super(p) {
+            vez = p?.readInt() ?: XIS
+            tabuleiro = Array(3) { IntArray(3) }
+            tabuleiro.forEach { p?.readIntArray(it) }
+        }
+
+        override fun writeToParcel(out: Parcel?, flags: Int) {
+            super.writeToParcel(out, flags)
+            out?.writeInt(vez)
+            tabuleiro.forEach { out?.writeIntArray(it) }
+        }
+
+        companion object CREATOR : Parcelable.Creator<EstadoJogo> {
+            override fun createFromParcel(source: Parcel?) = EstadoJogo(source)
+            override fun newArray(size: Int) = arrayOf<EstadoJogo>()
+        }
     }
 
     interface JogoDaVelhaListener {
