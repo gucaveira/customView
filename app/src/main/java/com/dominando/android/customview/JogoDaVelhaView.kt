@@ -6,7 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
-import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -18,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toBitmapOrNull
 import kotlin.math.min
+import kotlinx.parcelize.Parcelize
 
 class JogoDaVelhaView
 @JvmOverloads constructor(
@@ -187,38 +187,16 @@ class JogoDaVelhaView
         invalidate()
     }
 
-   class EstadoJogo : BaseSavedState {
-        var vez: Int
+    @Parcelize
+    class EstadoJogo(
+        private val state: Parcelable?,
+        var vez: Int,
         var tabuleiro: Array<IntArray>
-
-        constructor(superState: Parcelable?, vez: Int, tabuleiro: Array<IntArray>) :
-                super(superState) {
-            this.vez = vez
-            this.tabuleiro = tabuleiro
-        }
-
-        constructor(p: Parcel?) : super(p) {
-            vez = p?.readInt() ?: XIS
-            tabuleiro = Array(3) { IntArray(3) }
-            tabuleiro.forEach { p?.readIntArray(it) }
-        }
-
-        override fun writeToParcel(out: Parcel?, flags: Int) {
-            super.writeToParcel(out, flags)
-            out?.writeInt(vez)
-            tabuleiro.forEach { out?.writeIntArray(it) }
-        }
-
-        companion object CREATOR : Parcelable.Creator<EstadoJogo> {
-            override fun createFromParcel(source: Parcel?) = EstadoJogo(source)
-            override fun newArray(size: Int) = arrayOf<EstadoJogo>()
-        }
-    }
+    ) : Parcelable, BaseSavedState(state)
 
     interface JogoDaVelhaListener {
         fun fimDeJogo(vencedor: Int)
     }
-
 
     companion object {
         const val XIS = 1
