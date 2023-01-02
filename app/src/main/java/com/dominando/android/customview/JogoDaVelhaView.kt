@@ -35,7 +35,17 @@ class JogoDaVelhaView
     private lateinit var detector: GestureDetector
     private lateinit var imageO: Bitmap
     var listener: JogoDaVelhaListener? = null
+    var corDaBarra: Int = 0
+    var larguraBarra: Float = 0.0F
 
+    init {
+        val styledAttrs = context.obtainStyledAttributes(attrs, R.styleable.JogoDaVelhaView)
+
+         styledAttrs.apply {
+             corDaBarra = getColor(R.styleable.JogoDaVelhaView_corDaBarra, Color.BLACK)
+             larguraBarra = getDimension(R.styleable.JogoDaVelhaView_larguraDaBarra, 3F)
+         }.recycle()
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -78,8 +88,8 @@ class JogoDaVelhaView
         val tamanhoF = tamanho.toFloat()
 
         // Desenhando as linhas
-        paint.color = Color.BLACK
-        paint.strokeWidth = 3F
+        paint.color = corDaBarra
+        paint.strokeWidth = larguraBarra
 
         // Verticais
         canvas?.drawLine(quadrante, 0F, quadrante, tamanhoF, paint)
@@ -205,5 +215,3 @@ class JogoDaVelhaView
         const val EMPATE = 3
     }
 }
-
-
